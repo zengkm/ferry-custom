@@ -56,6 +56,13 @@
               type="text"
               icon="el-icon-edit"
               @click="handleView(scope.row)"
+            >处理</el-button>
+            <el-button
+              v-permisaction="['process:list:upcoming:select']"
+              size="mini"
+              type="text"
+              icon="el-icon-document"
+              @click="handleEdit(scope.row)"
             >查看</el-button>
             <el-button
               v-if="scope.row.is_end===0"
@@ -168,7 +175,10 @@ export default {
       this.getList()
     },
     handleView(row) {
-      this.$router.push({ name: 'ProcessListHandle', query: { workOrderId: row.id, processId: row.process }})
+      this.$router.push({ name: 'ProcessListHandle', query: { workOrderId: row.id, processId: row.process, type: 3 }})
+    },
+    handleEdit(row) {
+      this.$router.push({ name: 'ProcessListHandle', query: { workOrderId: row.id, processId: row.process, type: 1 }})
     },
     handleInversion(row) {
       this.dialogVisible = true

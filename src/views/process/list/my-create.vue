@@ -48,15 +48,23 @@
             <span>{{ parseTime(scope.row.create_time) }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="180">
+        <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="240">
           <template slot-scope="scope">
             <el-button
               v-permisaction="['process:list:myCreate:select']"
               size="mini"
               type="text"
-              icon="el-icon-edit"
+              icon="el-icon-document"
               @click="handleView(scope.row)"
             >查看</el-button>
+            <el-button
+              v-if="scope.row.state_name==='后台人员处理'"
+              v-permisaction="['process:list:myCreate:select']"
+              size="mini"
+              type="text"
+              icon="el-icon-edit"
+              @click="handleEdit(scope.row)"
+            >编辑</el-button>
             <el-button
               v-permisaction="['process:list:myCreate:reopen']"
               size="mini"
@@ -146,7 +154,10 @@ export default {
       this.getList()
     },
     handleView(row) {
-      this.$router.push({ name: 'ProcessListHandle', query: { workOrderId: row.id, processId: row.process }})
+      this.$router.push({ name: 'ProcessListHandle', query: { workOrderId: row.id, processId: row.process, type: 1 }})
+    },
+    handleEdit(row) {
+      this.$router.push({ name: 'ProcessListHandle', query: { processId: row.process, workOrderId: row.id, type: 2 }})
     },
     handleReopen(id) {
       this.$confirm('根据此工单新建一个新的工单?', '提示', {

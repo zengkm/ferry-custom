@@ -51,15 +51,23 @@
             <span>{{ parseTime(scope.row.create_time) }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="240">
+        <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="300">
           <template slot-scope="scope">
             <el-button
               v-permisaction="['process:list:all:select']"
               size="mini"
               type="text"
-              icon="el-icon-edit"
+              icon="el-icon-document"
               @click="handleView(scope.row)"
             >查看</el-button>
+            <el-button
+              v-if="scope.row.state_name==='后台人员处理' && (userId == scope.row.creator || roles.includes('admin'))"
+              v-permisaction="['process:list:all:select']"
+              size="mini"
+              type="text"
+              icon="el-icon-edit"
+              @click="handleEdit(scope.row)"
+            >编辑</el-button>
             <el-button
               v-if="scope.row.is_end===0"
               v-permisaction="['process:list:all:inversion']"
@@ -127,6 +135,7 @@
 <script>
 import { workOrderList, unityWorkOrder, inversionWorkOrder, deleteWorkOrder } from '@/api/process/work-order'
 import { listUser } from '@/api/system/sysuser'
+import { mapState } from 'vuex'
 
 // 搜索
 import WorkOrderSearch from './components/search/index'
@@ -162,6 +171,12 @@ export default {
       }
     }
   },
+  computed: {
+    ...mapState({
+      userId: state => state.user.userId,
+      roles: state => state.user.roles
+    })
+  },
   created() {
     this.getList()
   },
@@ -186,7 +201,10 @@ export default {
       this.getList()
     },
     handleView(row) {
-      this.$router.push({ name: 'ProcessListHandle', query: { workOrderId: row.id, processId: row.process }})
+      this.$router.push({ name: 'ProcessListHandle', query: { workOrderId: row.id, processId: row.process, type: 1 }})
+    },
+    handleEdit(row) {
+      this.$router.push({ name: 'ProcessListHandle', query: { processId: row.process, workOrderId: row.id, type: 2 }})
     },
     handleDelete(row) {
       this.$confirm('此操作将删除该数据, 是否继续?', '提示', {

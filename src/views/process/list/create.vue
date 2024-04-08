@@ -25,23 +25,22 @@
         <span>表单信息</span>
       </div>
       <div class="text item">
-        <template v-for="(tplItem, tplIndex) in processStructureValue.tpls">
-          <fm-generate-form
-            v-show="currentNode.hideTpls===undefined ||
-              currentNode.hideTpls===null ||
-              currentNode.hideTpls.indexOf(tplItem.id)===-1"
-            :key="tplIndex"
-            :ref="'generateForm-'+tplItem.id"
-            :preview="currentNode.hideTpls===undefined ||
-              currentNode.hideTpls===null ||
-              currentNode.hideTpls.indexOf(tplItem.id)===-1?false:true"
-            :remote="remoteFunc"
-            :data="tplItem.form_structure"
-            :disabled="currentNode.readonlyTpls===undefined ||
-              currentNode.readonlyTpls===null ||
-              currentNode.readonlyTpls.indexOf(tplItem.id)===-1?null:true"
-          />
-        </template>
+        <fm-generate-form
+          v-for="(tplItem, tplIndex) in processStructureValue.tpls"
+          v-show="currentNode.hideTpls===undefined ||
+            currentNode.hideTpls===null ||
+            currentNode.hideTpls.indexOf(tplItem.id)===-1"
+          :key="tplIndex"
+          :ref="'generateForm-'+tplItem.id"
+          :preview="currentNode.hideTpls===undefined ||
+            currentNode.hideTpls===null ||
+            currentNode.hideTpls.indexOf(tplItem.id)===-1?false:true"
+          :remote="remoteFunc"
+          :data="tplItem.form_structure"
+          :disabled="currentNode.readonlyTpls===undefined ||
+            currentNode.readonlyTpls===null ||
+            currentNode.readonlyTpls.indexOf(tplItem.id)===-1?null:true"
+        />
       </div>
       <hr style="background-color: #d9d9d9; border:0; height:1px;">
       <div class="text item" style="text-align: center;margin-top:18px">

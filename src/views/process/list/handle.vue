@@ -69,27 +69,24 @@
           <span>表单信息</span>
         </div>
         <div class="text item">
-          <template v-for="(tplItem, tplIndex) in processStructureValue.tpls">
+          <template>
             <fm-generate-form
-              v-show="currentNode.hideTpls===undefined ||
-                currentNode.hideTpls===null ||
-                currentNode.hideTpls.indexOf(tplItem.form_structure.id)===-1"
+              v-for="(tplItem, tplIndex) in processStructureValue.tpls"
+              v-show="$route.query.type == 2 && lastNode.hideTpls.indexOf(tplItem.form_structure.id)==-1 || $route.query.type != 2 &&(
+                currentNode.hideTpls.indexOf(tplItem.form_structure.id)===-1)"
               :key="tplIndex"
               :ref="'generateForm-'+tplItem.id"
-              :preview="!!((currentNode.hideTpls!==undefined &&
-                currentNode.hideTpls!==null &&
-                currentNode.hideTpls.indexOf(tplItem.form_structure.id)!==-1) ||
-                (currentNode.writeTpls===undefined ||
-                currentNode.writeTpls===null ||
-                currentNode.writeTpls.indexOf(tplItem.form_structure.id)===-1)||
-                (isActiveProcessing && currentNode.activeOrder))"
+              :preview="$route.query.type == 1 ||
+                $route.query.type == 3 && currentNode.writeTpls.indexOf(tplItem.form_structure.id)==-1||
+                $route.query.type == 2 && lastNode.writeTpls.indexOf(tplItem.form_structure.id)==-1||
+                (isActiveProcessing && currentNode.activeOrder)"
               :remote="remoteFunc"
               :value="tplItem.form_data"
               :data="tplItem.form_structure"
             />
           </template>
         </div>
-        <div v-if="processStructureValue.userAuthority">
+        <div v-if="processStructureValue.userAuthority && $route.query.type == 3">
           <hr style="background-color: #d9d9d9; border:0; height:1px; margin-bottom: 15px">
           <div>
             <el-input
@@ -125,6 +122,26 @@
                 </el-button>
               </template>
             </div>
+          </div>
+        </div>
+        <div v-else-if="$route.query.type == 2 && lastNode.clazz == 'start' && lastNode.writeTpls && lastNode.writeTpls.length > 0">
+          <div>
+            <el-input
+              v-model="remarks"
+              type="textarea"
+              placeholder="请输入编辑备注信息"
+              maxlength="200"
+              :autosize="{ minRows: 3, maxRows: 99}"
+              show-word-limit
+            />
+          </div>
+          <div class="text item" style="text-align: center;margin-top:18px">
+            <el-button
+              type="primary"
+              @click="updateOrder"
+            >
+              编辑
+            </el-button>
           </div>
         </div>
       </el-card>
@@ -189,8 +206,12 @@ export default {
     return {
       isLoadingStatus: true,
       currentNode: {
-        hideTpls: null,
-        writeTpls: null
+        hideTpls: [],
+        writeTpls: []
+      },
+      lastNode: {
+        hideTpls: [],
+        writeTpls: []
       },
       isActiveProcessing: false,
       tpls: [],
@@ -236,6 +257,7 @@ export default {
     ])
   },
   created() {
+    // this.$route.query.type, 1查看，2编辑，3处理
     this.getProcessNodeList()
   },
   methods: {
@@ -249,19 +271,23 @@ export default {
         this.circulationHistoryList = this.processStructureValue.circulationHistory
         // 获取当前展示节点列表
         this.nodeStepList = []
-        if (this.processStructureValue.nodes) {
-          for (var i = 0; i < this.processStructureValue.nodes.length; i++) {
-            if (this.processStructureValue.nodes[i].id === this.processStructureValue.workOrder.current_state) {
+        const nodeList = this.processStructureValue.nodes
+        if (nodeList) {
+          for (var i = 0; i < nodeList.length; i++) {
+            if (nodeList[i].id === this.processStructureValue.workOrder.current_state) {
               // 当前节点
-              this.nodeStepList.push(this.processStructureValue.nodes[i])
+              this.nodeStepList.push(nodeList[i])
               this.activeIndex = this.nodeStepList.length - 1
-              if (i + 1 === this.processStructureValue.nodes.length) {
+              if (i + 1 === nodeList.length) {
                 this.activeIndex = this.nodeStepList.length
               }
-              this.currentNode = this.processStructureValue.nodes[i]
-            } else if (!this.processStructureValue.nodes[i].isHideNode) {
+              this.currentNode = nodeList[i]
+              if (i > 0) {
+                this.lastNode = nodeList[i - 1]
+              }
+            } else if (!nodeList[i].isHideNode) {
               // 非隐藏节点
-              this.nodeStepList.push(this.processStructureValue.nodes[i])
+              this.nodeStepList.push(nodeList[i])
             }
           }
         }
@@ -269,11 +295,21 @@ export default {
         // 如果回退到初始节点则可编辑。
         if (this.activeIndex === 0 && this.currentNode.clazz === 'start') {
           this.currentNode.writeTpls = []
-          for (var tplTmp of this.processStructureValue.tpls) {
+          for (const tplTmp of this.processStructureValue.tpls) {
             this.currentNode.writeTpls.push(tplTmp.form_structure.id)
           }
         }
-
+        if (this.lastNode.clazz === 'start') {
+          this.lastNode.writeTpls = []
+          for (const tplTmp of this.processStructureValue.tpls) {
+            this.lastNode.writeTpls.push(tplTmp.form_structure.id)
+          }
+        }
+        // 初始化
+        this.currentNode.hideTpls = this.currentNode.hideTpls || []
+        this.currentNode.writeTpls = this.currentNode.writeTpls || []
+        this.lastNode.hideTpls = this.lastNode.hideTpls || []
+        this.lastNode.writeTpls = this.lastNode.writeTpls || []
         // 判断是否需要主动处理
         for (var stateValue of this.processStructureValue.workOrder.state) {
           if (this.processStructureValue.workOrder.current_state === stateValue.id && stateValue.processor.length > 1) {
@@ -284,6 +320,14 @@ export default {
         this.isLoadingStatus = false
         this.getAlertMessage()
       })
+    },
+    updateOrder() {
+      const item = {
+        target: this.processStructureValue.workOrder.current_state,
+        label: '编辑',
+        isExecuteTask: false
+      }
+      this.submitAction(item)
     },
     submitAction(item) {
       var promiseList = []
@@ -311,9 +355,9 @@ export default {
           tpls: this.tpls
         }).then(response => {
           if (response.code === 200) {
-          // this.$router.push({ name: 'upcoming' })
+            this.$router.push({ path: '/process/upcoming' })
           // window.location.reload()
-            this.getProcessNodeList()
+            // this.getProcessNodeList()
           }
         })
       })

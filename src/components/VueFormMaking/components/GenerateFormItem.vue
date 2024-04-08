@@ -75,9 +75,7 @@
         />
       </template>
       <template v-else>
-        <div>
-          {{ dataModel }}
-        </div>
+        <div v-html="formattedDataModel" />
       </template>
     </template>
     <template v-else>
@@ -470,6 +468,11 @@ export default {
     }
 
     this.handleDisplayVerifiy()
+  },
+  computed: {  
+    formattedDataModel() {  
+      return this.dataModel.replace(/\n/g, '<br>');  
+    }  
   },
   methods: {
     cascaderChild(options) {

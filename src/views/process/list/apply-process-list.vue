@@ -23,39 +23,37 @@
             {{ item.name }}
           </div>
           <div style="margin-bottom: 15px;">
-            <template v-for="(buttonItem, buttonIndex) in item.process_list">
-              <el-tooltip :key="buttonItem.id" effect="dark" placement="top">
-                <div slot="content">
-                  {{ buttonItem.name }}
-                  <br>
-                  {{ buttonItem.remarks }}
-                </div>
-                <div
-                  class="workflow-classify-div"
-                  :style="(buttonIndex + 1) % 5 === 0 ? {'padding-right': 0} : {'padding-right': '12px'}"
+            <el-tooltip v-for="(buttonItem, buttonIndex) in item.process_list" :key="buttonItem.id" effect="dark" placement="top">
+              <div slot="content">
+                {{ buttonItem.name }}
+                <br>
+                {{ buttonItem.remarks }}
+              </div>
+              <div
+                class="workflow-classify-div"
+                :style="(buttonIndex + 1) % 5 === 0 ? {'padding-right': 0} : {'padding-right': '12px'}"
+              >
+                <el-button
+                  style="width: 100%"
+                  plain
+                  @click="submitWorkOrder(buttonItem.id)"
                 >
-                  <el-button
-                    style="width: 100%"
-                    plain
-                    @click="submitWorkOrder(buttonItem.id)"
-                  >
-                    <div class="process-button-div">
-                      <div class="process-div-icon">
-                        <e-icon class="process-div-el-icon" :icon-name="buttonItem.icon" />
+                  <div class="process-button-div">
+                    <div class="process-div-icon">
+                      <e-icon class="process-div-el-icon" :icon-name="buttonItem.icon" />
+                    </div>
+                    <div class="process-div-body">
+                      <div class="process-div-title ellipsis">
+                        {{ buttonItem.name }}
                       </div>
-                      <div class="process-div-body">
-                        <div class="process-div-title ellipsis">
-                          {{ buttonItem.name }}
-                        </div>
-                        <div class="process-div-remarks ellipsis">
-                          {{ buttonItem.remarks }}
-                        </div>
+                      <div class="process-div-remarks ellipsis">
+                        {{ buttonItem.remarks }}
                       </div>
                     </div>
-                  </el-button>
-                </div>
-              </el-tooltip>
-            </template>
+                  </div>
+                </el-button>
+              </div>
+            </el-tooltip>
           </div>
         </div>
       </div>

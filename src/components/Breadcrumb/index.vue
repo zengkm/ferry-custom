@@ -39,8 +39,16 @@ export default {
       if (!this.isDashboard(first)) {
         matched = [{ path: '/dashboard', meta: { title: '首页' }}].concat(matched)
       }
-
       this.levelList = matched.filter(item => item.meta && item.meta.title && item.meta.breadcrumb !== false)
+      const length = this.levelList.length
+      if (this.levelList[length - 1].path === '/process/handle-ticket') {
+        const mapTitle = {
+          1: '查看工单',
+          2: '编辑工单',
+          3: '处理工单'
+        }
+        this.levelList[length - 1].meta.title = mapTitle[this.$route.query.type]
+      }
     },
     isDashboard(route) {
       const name = route && route.name

@@ -355,7 +355,7 @@ export default {
           tpls: this.tpls
         }).then(response => {
           if (response.code === 200) {
-            this.$router.push({ path: '/process/upcoming' })
+            this.$router.back()
           // window.location.reload()
             // this.getProcessNodeList()
           }

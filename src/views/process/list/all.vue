@@ -7,27 +7,28 @@
 
       <el-table v-loading="loading" border :data="ticketList" @selection-change="handleSelectionChange">
         <!-- <el-table-column type="selection" width="55" align="center" /> -->
-        <el-table-column label="ID" prop="id" width="120" />
-        <el-table-column label="标题" prop="title" :show-overflow-tooltip="true" />
-        <el-table-column label="项目名称" prop="project_name" :show-overflow-tooltip="true" width="180" />
-        <el-table-column label="计划完成时间" align="center" prop="finish_time" width="180">
+        <el-table-column label="ID" prop="id" min-width="50" />
+        <el-table-column label="标题" prop="title" :show-overflow-tooltip="true" min-width="120" />
+        <el-table-column label="流程" prop="process_name" :show-overflow-tooltip="true" />
+        <el-table-column label="项目名称" prop="project_name" :show-overflow-tooltip="true" min-width="120" />
+        <el-table-column label="计划完成时间" align="center" prop="finish_time" min-width="120">
           <template slot-scope="scope">
-            <span>{{ parseTime(scope.row.finish_time) }}</span>
+            <span>{{ parseTime(scope.row.finish_time, '{y}-{m}-{d}') }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="当前状态" :show-overflow-tooltip="true">
+        <el-table-column label="当前状态" :show-overflow-tooltip="true" min-width="120">
           <template slot-scope="scope">
             <span>
               {{ scope.row.state_name }}
             </span>
           </template>
         </el-table-column>
-        <el-table-column label="当前处理人" :show-overflow-tooltip="true">
+        <el-table-column label="当前处理人" :show-overflow-tooltip="true" min-width="120">
           <template slot-scope="scope">
             <span v-if="scope.row.is_end===0">{{ scope.row.principals }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="优先级" :show-overflow-tooltip="true" width="120" align="left">
+        <el-table-column label="优先级" :show-overflow-tooltip="true" min-width="100" align="left">
           <template slot-scope="scope">
             <span v-if="scope.row.priority===2">
               <el-tag type="warning">紧急</el-tag>
@@ -40,18 +41,18 @@
             </span>
           </template>
         </el-table-column>
-        <el-table-column label="是否结束" :show-overflow-tooltip="true" width="80" align="center">
+        <el-table-column label="是否结束" :show-overflow-tooltip="true" min-width="80" align="center">
           <template slot-scope="scope">
             <el-tag v-if="scope.row.is_end===0" size="mini" type="success">否</el-tag>
             <el-tag v-else size="mini" type="danger">是</el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="创建时间" align="center" prop="create_time" width="180">
+        <el-table-column label="创建时间" align="center" prop="create_time" min-width="180">
           <template slot-scope="scope">
             <span>{{ parseTime(scope.row.create_time) }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="300">
+        <el-table-column label="操作" align="left" class-name="small-padding fixed-width" min-width="180">
           <template slot-scope="scope">
             <el-button
               v-permisaction="['process:list:all:select']"
@@ -277,5 +278,8 @@ export default {
 </script>
 
 <style scoped>
-
+.el-button{
+  margin-left:0;
+  margin-right: 10px;
+}
 </style>
